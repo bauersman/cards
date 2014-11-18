@@ -6,8 +6,9 @@ class CardDistributor
   attr_reader :stacks, :deck
   def initialize
     @stacks = [Stack.new('A'), Stack.new('B'), Stack.new('C'), Stack.new('D')]
-    @deck = Deck.new
-    @speed = 0.1
+    @deck = Deck.new.shuffle!
+    @speed = 0.2
+    @rotates = 0
   end
 
   def distribute!
@@ -18,31 +19,66 @@ class CardDistributor
       end
       rotate_deck
     end
-    puts "Done!"
-    binding.pry
+    puts "Done! Had to rotate #{@rotates} times."
   end
 
   private
 
   def find_stack_to_receive(card)
     return if card.nil?
-    puts "Looking for stack to place card #{card}."
+    #puts "Looking for stack to place card #{card}."
     stacks.find &->(stack) { stack.can_receive?(card) }
   end
 
   def push_top_card_on_stack(stack)
     puts "Pushing card #{deck.top_card} onto stack #{stack.name}. Deck has now #{deck.count-1} cards."
-    stack.push deck.pop
+    stack.push! deck.pop
     sleep(0.2*@speed)
   end
 
   def rotate_deck
     return if deck.empty?
     deck.rotate!
+    @rotates += 1
     puts "Rotating deck, new card: #{deck.top_card}. "
     sleep(0.04*@speed)
   end
 
 end
 
-CardDistributor.new.distribute!
+class Dealer
+  attr_reader :rows, :deck
+
+  def initialize
+    @deck = Deck.new.shuffle!
+    @rows = (1..7).map &->(i) { Row.new(i) }
+  end
+
+  def deal!
+    0.upto(6) do |i|
+      rows[i..-1].each do |row|
+        row.push deck.pop
+      end
+    end
+    rows.each(&:turn_top)
+    binding.pry
+  end
+
+  def display
+    puts rows.map(&:display).join("\n")
+  end
+
+  def display_horz
+    @done = false
+    @current_position = 0
+    while not @done
+      cards = rows.map &->(row) { row.cards[@current_position] }
+      line = cards.map { |card| card.nil? ? '  ' : card.display }.join(' ')
+      @done = true if line =~ /^\s+$/
+      puts line
+      @current_position += 1
+    end
+  end
+end
+
+Dealer.new.deal!

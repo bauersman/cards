@@ -6,9 +6,10 @@ class Card
 
   attr_reader :number, :color
 
-  def initialize(number, color)
+  def initialize(number, color, turned=false)
     @number = number.to_s
     @color = color.is_a?(Integer) ? COLORS[color] : color
+    @turned = turned
   end
 
   def ==(other_card)
@@ -33,8 +34,20 @@ class Card
     Card.new(NUMBERS[number_index-1], color)
   end
 
+  def turn!
+    @turned = !@turned
+  end
+
+  def turned?
+    @turned
+  end
+
   def to_s
     number + color
+  end
+
+  def display
+    turned? ? to_s : 'XX'
   end
 
   def number_index

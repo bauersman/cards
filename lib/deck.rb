@@ -1,7 +1,8 @@
 require 'delegate'
 
 class Deck < DelegateClass(Array)
-  def initialize
+  def initialize(turned=false)
+    @turned = turned
     build_deck
     super(@cards)
   end
@@ -15,13 +16,28 @@ class Deck < DelegateClass(Array)
     @cards.rotate!(-1)
   end
 
+  def shuffle!
+    @cards.shuffle!
+    self
+  end
+
+  def turn!
+    reverse!
+    @cards.each(&:turn!)
+    @turned = !@turned
+  end
+
+  def turned?
+    @turned
+  end
+
   private
 
   def build_deck
     @cards = Card::COLORS.map do |color|
       Card::NUMBERS.map do |number|
-        Card.new(number, color)
+        Card.new(number, color, @turned)
       end
-    end.flatten.shuffle
+    end.flatten
   end
 end

@@ -8,6 +8,10 @@ class Stack
 
   def push(card)
     return false unless can_receive?(card)
+    push!(card)
+  end
+
+  def push!(card)
     @cards << card
     true
   end
