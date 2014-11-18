@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gem 'pry'
+gem 'pry-doc'
+gem 'pry-docmore'
+gem 'pry-rescue'
+gem 'pry-nav'
+gem 'pry-remote'
+gem 'pry-stack_explorer'
+gem 'rspec'

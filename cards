@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift './lib'
+require 'init'
+
+class CardDistributor
+  attr_reader :stacks, :deck
+  def initialize
+    @stacks = [Stack.new('A'), Stack.new('B'), Stack.new('C'), Stack.new('D')]
+    @deck = Deck.new
+    @speed = 0.1
+  end
+
+  def distribute!
+    puts "Starting to distribute, starting card: #{deck.top_card}"
+    while !deck.empty?
+      while stack = find_stack_to_receive(deck.top_card)
+        push_top_card_on_stack(stack)
+      end
+      rotate_deck
+    end
+    puts "Done!"
+    binding.pry
+  end
+
+  private
+
+  def find_stack_to_receive(card)
+    return if card.nil?
+    puts "Looking for stack to place card #{card}."
+    stacks.find &->(stack) { stack.can_receive?(card) }
+  end
+
+  def push_top_card_on_stack(stack)
+    puts "Pushing card #{deck.top_card} onto stack #{stack.name}. Deck has now #{deck.count-1} cards."
+    stack.push deck.pop
+    sleep(0.2*@speed)
+  end
+
+  def rotate_deck
+    return if deck.empty?
+    deck.rotate!
+    puts "Rotating deck, new card: #{deck.top_card}. "
+    sleep(0.04*@speed)
+  end
+
+end
+
+CardDistributor.new.distribute!
